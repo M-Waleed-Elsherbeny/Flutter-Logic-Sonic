@@ -19,8 +19,7 @@ class _MultiSelectionsState extends State<MultiSelections> {
     "Food",
   ];
 
-  int? selectedIndex;
-  List<int> selectedIndices = [];
+  Set<String> selectedOptions = {};
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -45,38 +44,70 @@ class _MultiSelectionsState extends State<MultiSelections> {
             runSpacing: 20.0,
             alignment: WrapAlignment.center,
             crossAxisAlignment: WrapCrossAlignment.start,
-            children: List.generate(
-              options.length,
-              (index) => GestureDetector(
+            children: List.generate(options.length, (index) {
+              final option = options[index];
+              final bool isSelectedOption = selectedOptions.contains(option);
+              return GestureDetector(
                 onTap: () {
                   setState(() {
-                    selectedIndex = index;
-                    if (selectedIndices.contains(index)) {
-                      selectedIndices.remove(index);
-                    } else {
-                      selectedIndices.add(index);
-                    }
+                    isSelectedOption
+                        ? selectedOptions.remove(option)
+                        : selectedOptions.add(option);
                   });
                 },
-                child: Container(
+                child: AnimatedContainer(
+                  duration: Duration(microseconds: 500),
+                  curve: Curves.easeIn,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
                     vertical: 16.0,
                   ),
                   decoration: BoxDecoration(
-                    color: selectedIndices.contains(index)
+                    color: isSelectedOption
                         ? Colors.blue
-                        : Colors.black,
-                    border: Border.all(color: Colors.blue),
+                        : Colors.grey.shade600,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    options[index],
-                    style: TextStyle(color: Colors.white),
+                    option,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: isSelectedOption
+                          ? FontWeight.bold
+                          : FontWeight.w400,
+                      fontSize: isSelectedOption ? 18 : 16,
+                    ),
                   ),
                 ),
-              ),
-            ),
+              );
+            }),
+          ),
+          SizedBox(height: 50),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: selectedOptions.map((e) {
+              return AnimatedContainer(
+                duration: Duration(microseconds: 800),
+                curve: Curves.bounceIn,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 16.0,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  border: Border.all(color: Colors.green),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  e,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              );
+            }).toList(),
           ),
         ],
       ),
